@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cyj.demo.dao.ConsumelogsDao">
+
+	<select id="getAllConsumelogs" parameterType="consumelogs"
+		resultType="consumelogs">
+		SELECT
+		consumelogs_id,consumelogs_cardNo,readRoomId,readrooms_name,consumelogs_inTime,consumelogs_outTime,consumelogs_status
+		FROM
+		consumelogs INNER JOIN readrooms ON readRoomId=readrooms_id
+		<where>
+			<if test=" readRoomId != null and readRoomId != '' ">AND readRoomId = #{readRoomId}</if>
+			<if
+				test=" consumelogs_cardNo != null and consumelogs_cardNo !='' ">AND consumelogs_cardNo LIKE "%"#{consumelogs_cardNo}"%"</if>
+			<if test=" consumelogs_status > -1 ">AND consumelogs_status = #{consumelogs_status}</if>
+			<if
+				test=" startTime != null and startTime != '' and endTime != null and endTime != '' ">
+				AND consumelogs_inTime BETWEEN #{startTime} AND #{endTime}
+			</if>
+			<if
+				test=" startTimes != null and startTimes != '' and endTimes != null and endTimeds != '' ">
+				AND consumelogs_outTime BETWEEN #{startTimes} AND #{endTimes}
+			</if>
+		</where>
+		ORDER BY consumelogs_id ASC
+		LIMIT #{startIndex},#{rows}
+	</select>
+
+	<select id="getAllConsumelogsByIds" parameterType="consumelogs"
+		resultType="consumelogs">
+		SELECT
+		consumelogs_id,consumelogs_cardNo,readRoomId,consumelogs_inTime,consumelogs_outTime,consumelogs_status
+		FROM
+		consumelogs
+	</select>
+
+	<select id="getByCardNo" parameterType="String"
+		resultType="consumelogs">
+		SELECT
+		consumelogs_id,consumelogs_cardNo,readRoomId,consumelogs_inTime,consumelogs_outTime,consumelogs_status
+		FROM
+		consumelogs WHERE consumelogs_cardNo = #{consumelogs_cardNo}
+	</select>
+
+	<select id="getConsumelogsCount" parameterType="consumelogs"
+		resultType="java.lang.Integer">
+		SELECT
+		COUNT(*)
+		FROM
+		consumelogs INNER JOIN readrooms ON
+		readRoomId=readrooms_id
+		<where>
+			<if test=" readRoomId != null and readRoomId != '' ">AND readRoomId = #{readRoomId}</if>
+			<if
+				test=" consumelogs_cardNo != null and consumelogs_cardNo !='' ">AND consumelogs_cardNo LIKE "%"#{consumelogs_cardNo}"%"</if>
+			<if test=" consumelogs_status != 0 ">AND consumelogs_status = #{consumelogs_status}</if>
+			<if
+				test=" startTime != null and startTime != '' and endTime != null and endTime != '' ">
+				AND consumelogs_inTime BETWEEN #{startTime} AND #{endTime}
+			</if>
+			<if
+				test=" startTimes != null and startTimes != '' and endTimes != null and endTimeds != '' ">
+				AND consumelogs_outTime BETWEEN #{startTimes} AND #{endTimes}
+			</if>
+		</where>
+		ORDER BY consumelogs_id ASC
+	</select>
+
+	<select id="getByStringId" parameterType="String"
+		resultType="consumelogs">
+		SELECT
+		consumelogs_id,consumelogs_cardNo,readRoomId,readrooms_name,consumelogs_inTime,consumelogs_outTime,consumelogs_status
+		FROM
+		consumelogs where consumelogs_id IN
+		<foreach collection="list" item="item" index="index"
+			separator="," close=")" open="(">
+			#{item}
+		</foreach>
+	</select>
+
+	<select id="getByCount" parameterType="consumelogs"
+		resultType="consumelogs">
+		SELECT
+		readRoomId, COUNT(readRoomId) AS
+		statistics_peopleNums FROM Consumelogs WHERE
+		readRoomId=#{readRoomId} AND consumelogs_inTime LIKE
+		"%"#{consumelogs_inTime}"%" GROUP BY readRoomId
+	</select>
+
+	<select id="getHighCharts" parameterType="consumelogs"
+		resultType="consumelogs">
+		<if test="tests == '学生' ">
+			SELECT students_name AS name,COUNT(consumelogs_cardNo) AS
+			data FROM consumelogs INNER JOIN students ON
+			consumelogs_cardNo=students_cardNo WHERE 1=1
+		</if>
+		<if test="tests == '老师' ">
+			SELECT teachers_name AS name,COUNT(consumelogs_cardNo) AS
+			data FROM consumelogs INNER JOIN teachers ON
+			consumelogs_cardNo=teachers_cardNo WHERE 1=1
+		</if>
+		<if test="dateString != null and dateString != '' ">
+			AND consumelogs_inTime LIKE "%"#{dateString}"%"
+		</if>
+		<if test=" data != null and data != ''">
+			AND consumelogs_inTime LIKE "%"#{data}"%"
+		</if>
+		GROUP BY consumelogs_cardNo
+	</select>
+
+	<insert id="saveConsumelogs" parameterType="consumelogs"
+		useGeneratedKeys="true" keyProperty="consumelogs_id">
+		INSERT INTO
+		consumelogs(consumelogs_cardNo,readRoomId,consumelogs_inTime,consumelogs_outTime,consumelogs_status)
+		VALUES
+		(#{consumelogs_cardNo},#{readRoomId},#{consumelogs_inTime},#{consumelogs_outTime},#{consumelogs_status})
+	</insert>
+
+	<update id="updConsumelogs" parameterType="consumelogs">
+		UPDATE consumelogs
+		<trim suffix="" suffixOverrides="," prefix="SET"
+			prefixOverrides="">
+			<if test="consumelogs_cardNo !=null and consumelogs_cardNo !=''">
+				consumelogs_cardNo=#{consumelogs_cardNo},
+			</if>
+			<if test="readRoomId != 0 ">
+				readRoomId=#{readRoomId},
+			</if>
+			<if test="consumelogs_inTime !=null and consumelogs_inTime !=''">
+				consumelogs_inTime=#{consumelogs_inTime},
+			</if>
+			<if test="consumelogs_outTime !=null and consumelogs_outTime !=''">
+				consumelogs_outTime=#{consumelogs_outTime},
+			</if>
+			<if test="consumelogs_status != -1 ">
+				consumelogs_status=#{consumelogs_status},
+			</if>
+		</trim>
+
+		<trim prefix="WHERE" prefixOverrides="AND|OR">
+			<if test="consumelogs_id != 0">
+				and consumelogs_id=#{consumelogs_id}
+			</if>
+		</trim>
+
+	</update>
+
+</mapper>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cyj.demo.dao.StatisticsDao">
+
+	<select id="getAllStatistics" parameterType="statistics"
+		resultType="statistics">
+		SELECT
+		statistics_id,readRoomId,readrooms_name,statistics_peopleNums,statistics_year,statistics_month,statistics_day
+		FROM
+		statistics INNER JOIN readrooms ON readRoomId=readrooms_id
+		<where>
+			<if test=" readRoomId != null and readRoomId != '' ">AND readRoomId = #{readRoomId}</if>
+			<if test=" statistics_year != null and statistics_year !='' ">AND statistics_year LIKE "%"#{statistics_year}"%"</if>
+			<if test=" statistics_month != null and statistics_month !='' ">AND statistics_month LIKE "%"#{statistics_month}"%"</if>
+			<if test=" statistics_day != null and statistics_day !='' ">AND statistics_day LIKE "%"#{statistics_day}"%"</if>
+		</where>
+		ORDER BY statistics_id ASC
+		LIMIT #{startIndex},#{rows}
+	</select>
+
+	<select id="getStatisticsCount" parameterType="statistics"
+		resultType="java.lang.Integer">
+		SELECT
+		COUNT(*)
+		FROM
+		statistics INNER JOIN readrooms ON
+		readRoomId=readrooms_id
+		<where>
+			<if test=" readRoomId != null and readRoomId != '' ">AND readRoomId = #{readRoomId}</if>
+			<if test=" statistics_year != null and statistics_year !='' ">AND statistics_year LIKE "%"#{statistics_year}"%"</if>
+			<if test=" statistics_month != null and statistics_month !='' ">AND statistics_month LIKE "%"#{statistics_month}"%"</if>
+			<if test=" statistics_day != null and statistics_day !='' ">AND statistics_day LIKE "%"#{statistics_day}"%"</if>
+		</where>
+		ORDER BY statistics_id ASC
+	</select>
+
+	<select id="getByStringId" parameterType="String"
+		resultType="statistics">
+		SELECT
+		statistics_id,readRoomId,statistics_peopleNums,statistics_year,statistics_month,statistics_day
+		FROM
+		statistics where statistics_id IN
+		<foreach collection="list" item="item" index="index"
+			separator="," close=")" open="(">
+			#{item}
+		</foreach>
+	</select>
+
+	<select id="getHighCharts" parameterType="statistics"
+		resultType="statistics">
+		SELECT readrooms_name AS name,SUM(statistics_peopleNums) AS data
+		FROM statistics INNER JOIN readrooms ON readRoomId=readrooms_id WHERE 1=1
+		<if test="statistics_year != null and statistics_year != '' ">
+			AND statistics_year = #{statistics_year}  
+		</if>
+		<if test="statistics_month != null and statistics_month != '' ">
+			AND statistics_month = #{statistics_month}
+		</if>
+		<if test="statistics_day != null and statistics_day != ''">
+			AND statistics_day = #{statistics_day}
+		</if>
+		GROUP BY readRoomId
+	</select>
+
+	<insert id="saveStatistics" parameterType="statistics"
+		useGeneratedKeys="true" keyProperty="statistics_id">
+		INSERT INTO
+		statistics(readRoomId,statistics_peopleNums,statistics_year,statistics_month,statistics_day)
+		VALUES
+		(#{readRoomId},#{statistics_peopleNums},#{statistics_year},#{statistics_month},#{statistics_day})
+	</insert>
+
+</mapper>

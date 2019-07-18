@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cyj.demo.dao.ReadroomsDao">
+
+	<select id="getAllReadrooms" parameterType="readrooms"
+		resultType="readrooms">
+		SELECT
+		readrooms_id,readrooms_name,readrooms_remark
+		FROM
+		readrooms 
+		<where>
+			<if test=" readrooms_name != null and readrooms_name !='' ">AND readrooms_name LIKE "%"#{readrooms_name}"%"</if>
+		</where>
+		ORDER BY readrooms_id ASC
+		LIMIT #{startIndex},#{rows}
+	</select>
+	
+	<select id="getAllReadroomsByIds" parameterType="readrooms"
+		resultType="readrooms">
+		SELECT
+		readrooms_id,readrooms_name,readrooms_remark
+		FROM
+		readrooms 
+	</select>
+	
+	<select id="getReadroomsCount" parameterType="readrooms"
+		resultType="java.lang.Integer">
+		SELECT
+		COUNT(*)
+		FROM
+		readrooms 
+		<where>
+			<if test=" readrooms_name != null and readrooms_name !='' ">AND readrooms_name LIKE "%"#{readrooms_name}"%"</if>
+		</where>
+		ORDER BY readrooms_id ASC
+	</select>
+	
+	<select id="getByStringId" parameterType="String"
+		resultType="readrooms">
+		SELECT
+		readrooms_id,readrooms_name,readrooms_remark
+		FROM
+		readrooms where readrooms_id IN 
+		<foreach collection="list" item="item" index="index"
+			separator="," close=")" open="(">
+			#{item}
+		</foreach>
+	</select>
+
+</mapper>

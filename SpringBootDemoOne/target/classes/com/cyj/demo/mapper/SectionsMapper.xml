@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cyj.demo.dao.SectionsDao">
+
+	<select id="getAllSections" parameterType="sections"
+		resultType="sections">
+		SELECT
+		sections_id,sections_name,sections_remark
+		FROM
+		sections 
+		<where>
+			<if test=" sections_name != null and sections_name !='' ">AND sections_name LIKE "%"#{sections_name}"%"</if>
+		</where>
+		ORDER BY sections_id ASC
+		LIMIT #{startIndex},#{rows}
+	</select>
+	
+	<select id="getAllSectionsByIds" parameterType="sections"
+		resultType="sections">
+		SELECT
+		sections_id,sections_name,sections_remark
+		FROM
+		sections 
+	</select>
+	
+	<select id="getSectionsCount" parameterType="sections"
+		resultType="java.lang.Integer">
+		SELECT
+		COUNT(*)
+		FROM
+		sections
+		<where>
+			<if test=" sections_name != null and sections_name !='' ">AND sections_name LIKE "%"#{sections_name}"%"</if>
+		</where>
+		ORDER BY sections_id ASC
+	</select>
+	
+	<select id="getByStringId" parameterType="String"
+		resultType="sections">
+		SELECT
+		sections_id,sections_name,sections_remark
+		FROM
+		sections where sections_id IN 
+		<foreach collection="list" item="item" index="index"
+			separator="," close=")" open="(">
+			#{item}
+		</foreach>
+	</select>
+
+	<delete id="delSections">
+		DELETE FROM sections
+		WHERE sections_id IN
+		<foreach collection="list" item="item" index="index"
+			separator="," close=")" open="(">
+			#{item}
+		</foreach>
+	</delete>
+
+	<insert id="saveSections" parameterType="sections"
+		useGeneratedKeys="true" keyProperty="sections_id">
+		INSERT INTO
+		sections(sections_name,sections_remark)
+		VALUES
+		(#{sections_name},#{sections_remark})
+	</insert>
+
+	<update id="updteSections"
+		parameterType="sections">
+		UPDATE sections
+		<trim suffix="" suffixOverrides="," prefix="SET"
+			prefixOverrides="">
+			<if test="sections_name !=null and sections_name !=''">
+				sections_name=#{sections_name},
+			</if>
+			<if test="sections_remark !=null and sections_remark !=''">
+				sections_remark=#{sections_remark},
+			</if>
+		</trim>
+
+		<trim prefix="WHERE" prefixOverrides="AND|OR">
+			<if test="sections_id != 0">
+				and sections_id=#{sections_id}
+			</if>
+		</trim>
+
+	</update>
+
+</mapper>

@@ -1,0 +1,20 @@
+server: 
+  port: 8080 
+  servlet: 
+    context-path: /SpringBootDemoOne 
+
+spring: 
+  datasource: 
+    driver-class-name: com.mysql.jdbc.Driver 
+    url: jdbc:mysql://127.0.0.1:3306/schools?characterEncoding=utf8 
+    username: root 
+    password: root 
+  mvc: 
+    view: 
+      prefix: /
+      suffix: .html
+      
+# mybatis读取mapper文件路径    
+mybatis: 
+  type-aliases-package: com.cyj.demo.entity # 定义所有操作类的别名所在包
+  mapper-locations: classpath*:com/cyj/demo/mapper/*.xml # 所有的mapper映射文件

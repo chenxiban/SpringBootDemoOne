@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cyj.demo.dao.TeachersDao">
+
+	<select id="getAllTeachers" parameterType="teachers"
+		resultType="Teachers">
+		SELECT
+		teachers_id,teachers_cardNo,teachers_name,teachers_sex,sections_name,teachers_status,teachers_remark
+		FROM
+		teachers INNER JOIN sections ON sections_id=sectionID
+		<where>
+			<if test=" teachers_name != null and teachers_name !='' ">AND teachers_name LIKE "%"#{teachers_name}"%"</if>
+			<if test=" teachers_sex != null and teachers_sex !='' ">AND teachers_sex =#{teachers_sex}</if>
+			<if test=" sections_name != null and sections_name !='' ">AND sections_name LIKE "%"#{sections_name}"%"</if>
+		</where>
+		ORDER BY teachers_id ASC
+		LIMIT #{startIndex},#{rows}
+	</select>
+	
+	<select id="getTeachersCount" parameterType="teachers"
+		resultType="java.lang.Integer">
+		SELECT
+		COUNT(*)
+		FROM
+		teachers INNER JOIN sections ON sections_id=sectionID
+		<where>
+			<if test=" teachers_name != null and teachers_name !='' ">AND teachers_name LIKE "%"#{teachers_name}"%"</if>
+			<if test=" teachers_sex != null and teachers_sex !='' ">AND teachers_sex =#{teachers_sex}</if>
+			<if test=" sections_name != null and sections_name !='' ">AND sections_name LIKE "%"#{sections_name}"%"</if>
+		</where>
+		ORDER BY teachers_id ASC
+	</select>
+	
+	<select id="getList" parameterType="teachers"
+		resultType="teachers">
+		SELECT
+		teachers_id,teachers_cardNo,teachers_name,teachers_sex,sectionID,teachers_status,teachers_remark
+		FROM
+		teachers 
+	</select>
+	
+	<select id="getByStringId" parameterType="String"
+		resultType="teachers">
+		SELECT
+		teachers_id,teachers_cardNo,teachers_name,teachers_sex,sectionID,teachers_status,teachers_remark
+		FROM
+		teachers where teachers_id IN 
+		<foreach collection="list" item="item" index="index"
+			separator="," close=")" open="(">
+			#{item}
+		</foreach>
+	</select>
+	
+	<delete id="delTeachers">
+		DELETE FROM teachers
+		WHERE teachers_id IN
+		<foreach collection="list" item="item" index="index"
+			separator="," close=")" open="(">
+			#{item}
+		</foreach>
+	</delete>
+
+	<insert id="saveTeachers" parameterType="teachers"
+		useGeneratedKeys="true" keyProperty="teachers_id">
+		INSERT INTO
+		teachers(teachers_cardNo,teachers_name,teachers_sex,sectionID,teachers_status,teachers_remark)
+		VALUES
+		(#{teachers_cardNo},#{teachers_name},#{teachers_sex},#{sectionID},#{teachers_status},#{teachers_remark})
+	</insert>
+
+	<update id="updteTeachers"
+		parameterType="teachers">
+		UPDATE teachers
+		<trim suffix="" suffixOverrides="," prefix="SET"
+			prefixOverrides="">
+			<if test="teachers_cardNo !=null and teachers_cardNo !=''">
+				teachers_cardNo=#{teachers_cardNo},
+			</if>
+			<if test="teachers_name !=null and teachers_name !=''">
+				teachers_name=#{teachers_name},
+			</if>
+			<if test="teachers_sex !=null and teachers_sex !=''">
+				teachers_sex=#{teachers_sex},
+			</if>
+			<if test="sectionID != 0">
+				sectionID=#{sectionID},
+			</if>
+			<if test="teachers_status != -1 ">
+				teachers_status=#{teachers_status},
+			</if>
+			<if test="teachers_remark !=null and teachers_remark !=''">
+				teachers_remark=#{teachers_remark},
+			</if>
+		</trim>
+
+		<trim prefix="WHERE" prefixOverrides="AND|OR">
+			<if test="teachers_id != 0">
+				and teachers_id=#{teachers_id}
+			</if>
+		</trim>
+
+	</update>
+
+</mapper>

@@ -1,0 +1,44 @@
+# 生产环境
+server: 
+  port: 8082
+  servlet: 
+    context-path: /SpringBootDemoOne
+
+spring: 
+#  profiles: 
+#    active: dev # dev是配置文件application-{}.yml的中间名
+  datasource: 
+    driver-class-name: com.mysql.jdbc.Driver 
+    url: 
+      jdbc: mysql://127.0.0.1:3306/schools 
+      username: root 
+      password: root 
+  #     spring mvc 视图解析器   
+  mvc: 
+    view: 
+      prefix: /
+      suffix: .html
+  # 时间格式化 
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+  # 时区设置
+    time-zone: GMT+8
+  
+user: 
+  name: test
+  password: test123
+  random: 
+    # 随机32位MD5字符串
+    secret: ${random.value}
+    # 随机int数字
+    intNumber: ${random.int}
+    # 随机long数字
+    longNumber: ${random.long}
+    # 随机uuid
+    uuid: ${random.uuid}
+    # 随机10以内的数字
+    lessTen: ${random.int(10)}
+    # 随机1024~65536之内的数字
+    range: ${random.int[1024,65536]} 
+
+  

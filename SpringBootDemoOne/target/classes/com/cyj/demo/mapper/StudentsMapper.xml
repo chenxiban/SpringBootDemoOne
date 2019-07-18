@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cyj.demo.dao.StudentsDao">
+
+	<select id="getAllStudents" parameterType="students"
+		resultType="students">
+		SELECT
+		students_id,students_cardNo,students_name,students_sex,membershipId,memberships_department,memberships_specialty,students_status,students_remark,students_stuNo
+		FROM
+		students INNER JOIN memberships ON membershipId=memberships_id
+		<where>
+			<if test=" students_name != null and students_name !='' ">AND students_name LIKE "%"#{students_name}"%"</if>
+			<if test=" students_sex != null and students_sex !='' ">AND students_sex LIKE "%"#{students_sex}"%"</if>
+			<if test=" memberships_department != null and memberships_department !='' ">AND memberships_department LIKE "%"#{memberships_department}"%"</if>
+			<if test=" memberships_specialty != null and memberships_specialty !='' ">AND memberships_specialty LIKE "%"#{memberships_specialty}"%"</if>
+		</where>
+		ORDER BY students_id ASC
+		LIMIT #{startIndex},#{rows}
+	</select>
+	
+	<select id="getStudentsCount" parameterType="students"
+		resultType="java.lang.Integer">
+		SELECT
+		COUNT(*)
+		FROM
+		students INNER JOIN memberships ON membershipId=memberships_id
+		<where>
+			<if test=" students_name != null and students_name !='' ">AND students_name LIKE "%"#{students_name}"%"</if>
+			<if test=" students_sex != null and students_sex !='' ">AND students_sex LIKE "%"#{students_sex}"%"</if>
+			<if test=" memberships_department != null and memberships_department !='' ">AND memberships_department LIKE "%"#{memberships_department}"%"</if>
+			<if test=" memberships_specialty != null and memberships_specialty !='' ">AND memberships_specialty LIKE "%"#{memberships_specialty}"%"</if>
+		</where>
+		ORDER BY students_id ASC
+	</select>
+	
+	<select id="getList" parameterType="students" resultType="students">
+		SELECT
+		students_id,students_cardNo,students_name,students_sex,students_status,students_remark,students_stuNo
+		FROM
+		students
+	</select>
+	
+	<select id="getByStringId" parameterType="String"
+		resultType="students">
+		SELECT
+		students_id,students_cardNo,students_name,students_sex,students_status,students_remark,students_stuNo
+		FROM
+		students where students_id IN 
+		<foreach collection="list" item="item" index="index"
+			separator="," close=")" open="(">
+			#{item}
+		</foreach>
+	</select>
+	
+	<update id="updStudents"
+		parameterType="students">
+		UPDATE students
+		<trim suffix="" suffixOverrides="," prefix="SET"
+			prefixOverrides="">
+			<if test="students_cardNo !=null and students_cardNo !=''">
+				students_cardNo=#{students_cardNo},
+			</if>
+			<if test="students_name !=null and students_name !=''">
+				students_name=#{students_name},
+			</if>
+			<if test="students_sex !=null and students_sex !=''">
+				students_sex=#{students_sex},
+			</if>
+			<if test="membershipId != 0">
+				membershipId=#{membershipId},
+			</if>
+			<if test="students_status != -1 ">
+				students_status=#{students_status},
+			</if>
+			<if test="students_remark !=null and students_remark !=''">
+				students_remark=#{students_remark},
+			</if>
+			<if test="students_stuNo !=null and students_stuNo !=''">
+				students_stuNo=#{students_stuNo},
+			</if>
+		</trim>
+
+		<trim prefix="WHERE" prefixOverrides="AND|OR">
+			<if test="students_id != 0">
+				and students_id=#{students_id}
+			</if>
+		</trim>
+
+	</update>
+
+</mapper>

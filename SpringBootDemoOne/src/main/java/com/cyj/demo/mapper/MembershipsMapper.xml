@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cyj.demo.dao.MembershipsDao">
+
+	<select id="getAllMemberships" parameterType="memberships"
+		resultType="memberships">
+		SELECT
+		memberships_id,memberships_department,memberships_specialty,memberships_degree
+		FROM
+		memberships 
+		<where>
+			<if test=" memberships_department != null and memberships_department !='' ">AND memberships_department LIKE "%"#{memberships_department}"%"</if>
+			<if test=" memberships_specialty != null and memberships_specialty !='' ">AND memberships_specialty LIKE "%"#{memberships_specialty}"%"</if>
+			<if test=" memberships_degree != null and memberships_degree !='' ">AND memberships_degree LIKE "%"#{memberships_degree}"%"</if>
+		</where>
+		ORDER BY memberships_id ASC
+		LIMIT #{startIndex},#{rows}
+	</select>
+	
+	<select id="getAllMembershipsByIds" parameterType="memberships"
+		resultType="memberships">
+		SELECT
+		memberships_id,memberships_department,memberships_specialty,memberships_degree
+		FROM
+		memberships 
+	</select>
+	
+	<select id="getMembershipsCount" parameterType="memberships"
+		resultType="java.lang.Integer">
+		SELECT
+		COUNT(*)
+		FROM
+		memberships 
+		<where>
+			<if test=" memberships_department != null and memberships_department !='' ">AND memberships_department LIKE "%"#{memberships_department}"%"</if>
+			<if test=" memberships_specialty != null and memberships_specialty !='' ">AND memberships_specialty LIKE "%"#{memberships_specialty}"%"</if>
+			<if test=" memberships_degree != null and memberships_degree !='' ">AND memberships_degree LIKE "%"#{memberships_degree}"%"</if>
+		</where>
+		ORDER BY memberships_id ASC
+	</select>
+	
+	<select id="getByStringId" parameterType="String"
+		resultType="memberships">
+		SELECT
+		memberships_id,memberships_department,memberships_specialty,memberships_degree
+		FROM
+		memberships where memberships_id IN 
+		<foreach collection="list" item="item" index="index"
+			separator="," close=")" open="(">
+			#{item}
+		</foreach>
+	</select>
+
+</mapper>
